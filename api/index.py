@@ -7,9 +7,12 @@ app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 # Pull Supabase connection string from Vercel Environment Variables
 database_url = os.environ.get('DATABASE_URL', '')
+database_url = os.environ.get('DATABASE_URL', '')
 if database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
-
+    database_url = database_url.replace("postgres://", "postgresql+psycopg://", 1)
+elif database_url.startswith("postgresql://"):
+    database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
