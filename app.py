@@ -40,8 +40,8 @@ class Review(db.Model):
     waitrose_comment = db.Column(db.Text)
     johnlewis_rating = db.Column(db.Integer, nullable=False)
     johnlewis_comment = db.Column(db.Text)
-    lidl_rating = db.Column(db.Integer, nullable=False)
-    lidl_comment = db.Column(db.Text)
+    apple_rating = db.Column(db.Integer, nullable=False)
+    apple_comment = db.Column(db.Text)
     argos_rating = db.Column(db.Integer, nullable=False)
     argos_comment = db.Column(db.Text)
     barbour_rating = db.Column(db.Integer, nullable=False)
@@ -67,7 +67,7 @@ def review(step):
         elif step < 7:
             return redirect(url_for('review', step=step+1))
     
-    brands = ['johnlewis', 'waitrose', 'disney', 'barbour', 'mands', 'lidl', 'argos']
+    brands = ['johnlewis', 'waitrose', 'disney', 'barbour', 'mands', 'apple', 'argos']
     if step <= len(brands):
         return render_template('review_form.html', step=step, brand=brands[step-1])
     
@@ -85,8 +85,8 @@ def submit():
         waitrose_comment=request.form.get('waitrose_comment', ''),
         johnlewis_rating=int(request.form.get('johnlewis_rating')),
         johnlewis_comment=request.form.get('johnlewis_comment', ''),
-        lidl_rating=int(request.form.get('lidl_rating')),
-        lidl_comment=request.form.get('lidl_comment', ''),
+        apple_rating=int(request.form.get('apple_rating')),
+        apple_comment=request.form.get('apple_comment', ''),
         argos_rating=int(request.form.get('argos_rating')),
         argos_comment=request.form.get('argos_comment', ''),
         barbour_rating=int(request.form.get('barbour_rating')),
@@ -104,7 +104,7 @@ def thank_you():
 @app.route('/results')
 def results():
     reviews = Review.query.all()
-    brands = ['johnlewis', 'waitrose', 'disney', 'barbour', 'mands', 'lidl', 'argos']
+    brands = ['johnlewis', 'waitrose', 'disney', 'barbour', 'mands', 'apple', 'argos']
     stats = {}
     
     for brand in brands:
@@ -127,7 +127,7 @@ def results():
 @app.route('/api/stats')
 def api_stats():
     reviews = Review.query.all()
-    brands = ['johnlewis', 'waitrose', 'disney', 'barbour', 'mands', 'lidl', 'argos']
+    brands = ['johnlewis', 'waitrose', 'disney', 'barbour', 'mands', 'apple', 'argos']
     stats = {}
     
     for brand in brands:

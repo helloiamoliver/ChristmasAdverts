@@ -2,7 +2,7 @@
 
 {% block content %}
 {% macro brand_name(b) -%}
-{{ {'johnlewis': 'John Lewis', 'mands': 'M&S Food'}.get(b, b|title) }}
+{{ {'johnlewis': 'John Lewis', 'mands': 'M&S'}.get(b, b|title) }}
 {%- endmacro %}
 
 <div class="min-h-screen px-4 pt-24 pb-16">
