@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 
-app = Flask(__name__, template_folder='../templates', static_folder='../static')
+app = Flask(__name__)
 
 # Pull Supabase connection string from Vercel Environment Variables
 database_url = os.environ.get('DATABASE_URL', '')
