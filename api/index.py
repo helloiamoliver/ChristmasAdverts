@@ -3,19 +3,26 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
+# Pull Supabase connection string from Vercel Environment Variables
+database_url = os.environ.get('DATABASE_URL', '')
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///christmas_reviews.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'Pxr&z0*qNyRzSXtc9gg8J!*@WsQ475'
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-secret-key-change-me')
 
 db = SQLAlchemy(app)
 
-# John Lewis, Waitrose, Disney, Barbour, M&S Food, Lidl, Argos
-
 # Database Models
 class Review(db.Model):
+    __tablename__ = 'reviews'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     disney_rating = db.Column(db.Integer, nullable=False)
@@ -34,9 +41,10 @@ class Review(db.Model):
     barbour_comment = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Create database tables
+# Create database tables in Supabase if they don't exist yet
 with app.app_context():
-    db.create_all()
+    if database_url:
+        db.create_all()
 
 @app.route('/')
 def welcome():
@@ -45,9 +53,7 @@ def welcome():
 @app.route('/review/<int:step>', methods=['GET', 'POST'])
 def review(step):
     if request.method == 'POST':
-        # Store data in session or pass along
         if step == 1:
-            # Start new review
             return redirect(url_for('review', step=2, name=request.form.get('name')))
         elif step < 7:
             return redirect(url_for('review', step=step+1))
@@ -60,24 +66,24 @@ def review(step):
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    review = Review(
+    new_review = Review(
         name=request.form.get('name'),
-        disney_rating = int(request.form.get('disney_rating')),
-        disney_comment = request.form.get('disney_comment', ''),
-        mands_rating = int(request.form.get('mands_rating')),
-        mands_comment = request.form.get('mands_comment', ''),
-        waitrose_rating = int(request.form.get('waitrose_rating')),
-        waitrose_comment = request.form.get('waitrose_comment', ''),
-        johnlewis_rating = int(request.form.get('johnlewis_rating')),
-        johnlewis_comment = request.form.get('johnlewis_comment', ''),
-        lidl_rating = int(request.form.get('lidl_rating')),
-        lidl_comment = request.form.get('lidl_comment', ''),
-        argos_rating = int(request.form.get('argos_rating')),
-        argos_comment = request.form.get('argos_comment', ''),
-        barbour_rating = int(request.form.get('barbour_rating')),
-        barbour_comment = request.form.get('barbour_comment', ''),
+        disney_rating=int(request.form.get('disney_rating')),
+        disney_comment=request.form.get('disney_comment', ''),
+        mands_rating=int(request.form.get('mands_rating')),
+        mands_comment=request.form.get('mands_comment', ''),
+        waitrose_rating=int(request.form.get('waitrose_rating')),
+        waitrose_comment=request.form.get('waitrose_comment', ''),
+        johnlewis_rating=int(request.form.get('johnlewis_rating')),
+        johnlewis_comment=request.form.get('johnlewis_comment', ''),
+        lidl_rating=int(request.form.get('lidl_rating')),
+        lidl_comment=request.form.get('lidl_comment', ''),
+        argos_rating=int(request.form.get('argos_rating')),
+        argos_comment=request.form.get('argos_comment', ''),
+        barbour_rating=int(request.form.get('barbour_rating')),
+        barbour_comment=request.form.get('barbour_comment', ''),
     )
-    db.session.add(review)
+    db.session.add(new_review)
     db.session.commit()
     
     return redirect(url_for('thank_you'))
@@ -89,15 +95,15 @@ def thank_you():
 @app.route('/results')
 def results():
     reviews = Review.query.all()
-    
-    # Calculate statistics
     brands = ['johnlewis', 'waitrose', 'disney', 'barbour', 'mands', 'lidl', 'argos']
     stats = {}
     
     for brand in brands:
         ratings = [getattr(r, f'{brand}_rating') for r in reviews]
-        comments = [{'name': r.name, 'comment': getattr(r, f'{brand}_comment')} 
-                   for r in reviews if getattr(r, f'{brand}_comment')]
+        comments = [
+            {'name': r.name, 'comment': getattr(r, f'{brand}_comment')} 
+            for r in reviews if getattr(r, f'{brand}_comment')
+        ]
         
         if ratings:
             stats[brand] = {
