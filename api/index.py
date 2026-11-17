@@ -12,13 +12,17 @@ if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql+psycopg://", 1)
 elif database_url.startswith("postgresql://"):
     database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
-    
+
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
+    "connect_args": {
+        "prepare_threshold": None
+    }
 }
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-secret-key-change-me')
 
 db = SQLAlchemy(app)
@@ -45,9 +49,11 @@ class Review(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Create database tables in Supabase if they don't exist yet
-with app.app_context():
+""" with app.app_context():
     if database_url:
         db.create_all()
+ """
+
 
 @app.route('/')
 def welcome():
