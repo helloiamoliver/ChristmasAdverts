@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% macro brand_name(b) -%}
+{{ {'johnlewis': 'John Lewis', 'mands': 'M&S Food'}.get(b, b|title) }}
+{%- endmacro %}
+
+<div class="min-h-screen px-4 pt-24 pb-16">
+    <div class="max-w-4xl mx-auto">
+
+        <header class="mb-10">
+            <h1 class="display text-5xl sm:text-6xl text-white leading-tight">Results</h1>
+            <p class="text-xl mt-2" style="color: #d6e6dc;">
+                Here's what everyone thought of this year's Christmas adverts.
+            </p>
+        </header>
+
+        {% if not stats %}
+        <div class="card p-8 sm:p-10">
+            <p class="text-2xl mb-6">No reviews yet. Be the first to share your thoughts.</p>
+            <a href="/" class="btn btn-berry">Rate the adverts</a>
+        </div>
+        {% else %}
+
+        {# Rank brands by average rating #}
+        {% set rows = [] %}
+        {% for brand in brands %}
+            {% if stats[brand] %}
+                {% set _ = rows.append({'key': brand, 'avg': stats[brand].average|float, 'shown': stats[brand].average, 'total': stats[brand].total}) %}
+            {% endif %}
+        {% endfor %}
+        {% set ranked = rows|sort(attribute='avg', reverse=true) %}
+
+        <!-- Ranking -->
+        <section class="card p-6 sm:p-10 mb-8" aria-labelledby="rankingHeading">
+            <h2 id="rankingHeading" class="display text-3xl sm:text-4xl mb-6" style="color: var(--spruce);">
+                Average ratings
+            </h2>
+            <ol class="space-y-5">
+                {% for row in ranked %}
+                <li class="grid grid-cols-[2rem_1fr_auto] items-center gap-x-4">
+                    <span class="display text-3xl text-right" style="color: {{ 'var(--berry)' if loop.first else 'var(--muted)' }};">{{ loop.index }}</span>
+                    <div>
+                        <a href="#{{ row.key }}" class="text-xl font-bold hover:underline">{{ brand_name(row.key) }}</a>
+                        <div class="mt-1.5 h-2 rounded-full" style="background: #e9e2d0;">
+                            <div class="bar h-full rounded-full" data-width="{{ (row.avg * 10)|round(1) }}"
+                                 style="width: {{ (row.avg * 10)|round(1) }}%; background: {{ 'var(--berry)' if loop.first else 'var(--spruce)' }};"></div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="display text-3xl" style="color: var(--ink);">{{ row.shown }}</span>
+                        <span class="block text-sm" style="color: var(--muted);">{{ row.total }} review{{ '' if row.total == 1 else 's' }}</span>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        </section>
+
+        <!-- Per-advert detail, in ranked order -->
+        {% for row in ranked %}
+        {% set brand = row.key %}
+        {% set s = stats[brand] %}
+        {% set counts = [] %}
+        {% for r in range(1, 11) %}{% set _ = counts.append(s.distribution.get(r, 0)) %}{% endfor %}
+        {% set peak = counts|max %}
+
+        <section id="{{ brand }}" class="card p-6 sm:p-10 mb-8 scroll-mt-6">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 mb-8">
+                <h2 class="display text-4xl" style="color: var(--spruce);">{{ brand_name(brand) }}</h2>
+                <p style="color: var(--muted);">Average {{ s.average }} from {{ s.total }} review{{ '' if s.total == 1 else 's' }}</p>
+            </div>
+
+            <div class="grid gap-10 {{ 'md:grid-cols-2' if s.comments else '' }}">
+
+                <div>
+                    <h3 class="text-lg font-bold mb-3">How they scored</h3>
+                    <div class="space-y-1.5">
+                        {% for rating in range(10, 0, -1) %}
+                        {% set count = s.distribution.get(rating, 0) %}
+                        {% set pct = (count / peak * 100) if peak > 0 else 0 %}
+                        <div class="flex items-center gap-3">
+                            <span class="w-6 text-right font-bold" style="color: var(--muted);">{{ rating }}</span>
+                            <div class="flex-1 h-5 rounded-sm" style="background: #efe9d9;">
+                                <div class="bar h-full rounded-sm" data-width="{{ pct|round(1) }}"
+                                     style="width: {{ pct|round(1) }}%; background: var(--berry);"></div>
+                            </div>
+                            <span class="w-6 font-bold tabular-nums">{{ count if count > 0 else '' }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if s.comments %}
+                <div>
+                    <h3 class="text-lg font-bold mb-3">What people said</h3>
+                    <ul class="space-y-4">
+                        {% for comment in s.comments %}
+                        {% if comment.comment %}
+                        <li class="pl-4 border-l-4" style="border-color: var(--gold);">
+                            <p class="text-lg leading-snug">&ldquo;{{ comment.comment }}&rdquo;</p>
+                            <p class="text-sm mt-1" style="color: var(--muted);">{{ comment.name }}</p>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+            </div>
+        </section>
+        {% endfor %}
+
+        <div class="no-print mt-10">
+            <button type="button" onclick="window.print()" class="btn btn-berry">Print results</button>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Bars grow once on load. Without JS (or with reduced motion) they simply show at full width.
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const bars = document.querySelectorAll('.bar');
+        bars.forEach(b => { b.style.width = '0%'; b.style.transition = 'width 0.7s ease-out'; });
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            bars.forEach(b => { b.style.width = b.dataset.width + '%'; });
+        }));
+    });
+</script>
+{% endblock %}

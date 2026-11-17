@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center p-8">
+    <div class="max-w-2xl w-full">
+        <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border-4 border-amber-400 text-center">
+            <div class="text-8xl mb-6">🎄</div>
+            
+            <h1 class="text-5xl font-bold mb-6 text-green-800">
+                Thank You!
+            </h1>
+            
+            
+            <p class="text-2xl text-gray-700 mb-8 leading-relaxed">
+                Your reviews have been submitted successfully!
+            </p>
+            
+            <p class="text-xl text-gray-600 mb-10">
+                Time to see how your ratings compare with everyone else's festive opinions...
+            </p>
+            
+            <a 
+                href="/results" 
+                class="inline-block bg-amber-400 text-gray-900 font-bold py-4 px-12 rounded-xl transition transform text-xl hover:bg-amber-600"
+            >
+                View Results 🎁
+            </a>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

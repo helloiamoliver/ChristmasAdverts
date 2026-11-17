@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block content %}
+{# One entry per advert, in viewing order. Form field names stay {key}_rating / {key}_comment. #}
+{% set adverts = [
+    ('johnlewis', 'John Lewis'),
+    ('waitrose', 'Waitrose'),
+    ('disney', 'Disney'),
+    ('barbour', 'Barbour'),
+    ('mands', 'M&S Food'),
+    ('lidl', 'Lidl'),
+    ('argos', 'Argos')
+] %}
+
+<div class="min-h-screen flex justify-center px-4 pt-24 pb-16">
+    <main class="card w-full max-w-xl p-6 sm:p-10 self-start">
+
+        <h1 class="display text-4xl sm:text-5xl leading-tight" style="color: var(--spruce);">
+            UK TTF Christmas Advert Reviews 2026
+        </h1>
+
+        <form action="/submit" method="POST" id="reviewForm" class="mt-6" novalidate>
+
+            <!-- Intro + name -->
+            <section id="introScreen">
+                <p class="display text-3xl mb-3" style="color: var(--berry);">Ho, ho, ho!</p>
+                <p class="text-lg leading-relaxed mb-3">
+                    You'll watch {{ adverts|length }} Christmas adverts on Microsoft Teams, in the order shown on screen. For each one:
+                </p>
+                <ol class="list-decimal ml-6 space-y-2 text-lg leading-relaxed marker:font-bold marker:text-[#a3202f]">
+                    <li>Watch the advert.</li>
+                    <li>Rate it out of ten, where 1 is awful and 10 is incredible.</li>
+                    <li>Add any comments, then press Next advert. We'll move on together once everyone is ready on Teams.</li>
+                </ol>
+                <p class="text-lg leading-relaxed mt-3">
+                    After the last advert, press Submit reviews to record your answers. Let the fun begin!
+                </p>
+
+                <hr class="rule my-8">
+
+                <label class="block text-lg font-bold mb-2" for="name">Your name</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    autocomplete="name"
+                    class="field"
+                    placeholder="Enter your name"
+                    aria-describedby="nameError"
+                >
+                <p id="nameError" class="mt-2 font-bold" style="color: var(--berry);" role="alert" hidden>
+                    Enter your name to start.
+                </p>
+            </section>
+
+            <!-- One screen per advert -->
+            <section id="reviewScreens" hidden>
+                <div class="mb-8">
+                    <p id="progressText" class="font-bold mb-2" style="color: var(--muted);" aria-live="polite"></p>
+                    <div class="flex gap-1.5" aria-hidden="true">
+                        {% for key, label in adverts %}
+                        <span class="progress-seg h-1.5 flex-1 rounded-full" style="background: var(--line);"></span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% for key, label in adverts %}
+                <div class="review-screen" data-brand="{{ key }}" hidden>
+                    <h2 class="display text-4xl mb-6 focus:outline-none" style="color: var(--spruce);" tabindex="-1">{{ label }}</h2>
+
+                    <fieldset class="mb-8">
+                        <legend class="text-lg font-bold mb-3">Rate the {{ label }} advert out of ten</legend>
+                        <div class="rating-row">
+                            {% for n in range(1, 11) %}
+                            <label class="bauble">
+                                <input type="radio" name="{{ key }}_rating" value="{{ n }}">
+                                <span>{{ n }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <div class="flex justify-between text-sm mt-3" style="color: var(--muted);">
+                            <span>1 Awful</span>
+                            <span>10 Incredible</span>
+                        </div>
+                    </fieldset>
+
+                    <div>
+                        <label class="block text-lg font-bold mb-2" for="{{ key }}_comment">
+                            Comments <span class="font-normal" style="color: var(--muted);">(optional)</span>
+                        </label>
+                        <textarea
+                            id="{{ key }}_comment"
+                            name="{{ key }}_comment"
+                            rows="4"
+                            class="field"
+                            placeholder="What did you think?"
+                        ></textarea>
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+
+            <div class="flex gap-3 mt-8">
+                <button type="button" id="backBtn" class="btn btn-ghost" hidden>Back</button>
+                <button type="button" id="nextBtn" class="btn btn-primary flex-1">Start rating</button>
+                <button type="submit" id="submitBtn" class="btn btn-berry flex-1" hidden disabled>Submit reviews</button>
+            </div>
+        </form>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // current = -1 is the intro/name screen; 0..n-1 are the adverts
+    let current = -1;
+
+    const form = document.getElementById('reviewForm');
+    const screens = [...document.querySelectorAll('.review-screen')];
+    const segs = [...document.querySelectorAll('.progress-seg')];
+    const introScreen = document.getElementById('introScreen');
+    const reviewScreens = document.getElementById('reviewScreens');
+    const progressText = document.getElementById('progressText');
+    const nameInput = document.getElementById('name');
+    const nameError = document.getElementById('nameError');
+    const backBtn = document.getElementById('backBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const last = screens.length - 1;
+
+    function isRated(index) {
+        const brand = screens[index].dataset.brand;
+        return !!form.querySelector(`input[name="${brand}_rating"]:checked`);
+    }
+
+    function render(moved) {
+        const onIntro = current === -1;
+
+        introScreen.hidden = !onIntro;
+        reviewScreens.hidden = onIntro;
+        screens.forEach((s, i) => { s.hidden = i !== current; });
+
+        backBtn.hidden = onIntro;
+        nextBtn.hidden = current === last;
+        submitBtn.hidden = current !== last;
+
+        if (!onIntro) {
+            progressText.textContent = `Advert ${current + 1} of ${screens.length}`;
+            segs.forEach((seg, i) => {
+                seg.style.background = i <= current ? 'var(--berry)' : 'var(--line)';
+            });
+            const ready = isRated(current);
+            nextBtn.disabled = !ready;
+            submitBtn.disabled = !ready;
+        } else {
+            nextBtn.disabled = false;
+            nextBtn.textContent = 'Start rating';
+        }
+        if (!onIntro) nextBtn.textContent = 'Next advert';
+
+        if (moved && !onIntro) {
+            const heading = screens[current].querySelector('h2');
+            heading.focus({ preventScroll: true });
+            heading.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+        if (moved && onIntro) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goNext() {
+        if (current === -1) {
+            if (!nameInput.value.trim()) {
+                nameError.hidden = false;
+                nameInput.focus();
+                return;
+            }
+            nameError.hidden = true;
+        } else if (!isRated(current)) {
+            return;
+        }
+        if (current < last) {
+            current++;
+            render(true);
+        }
+    }
+
+    nextBtn.addEventListener('click', goNext);
+
+    backBtn.addEventListener('click', () => {
+        if (current > -1) {
+            current--;
+            render(true);
+        }
+    });
+
+    form.addEventListener('change', (e) => {
+        if (e.target.type === 'radio') render(false);
+    });
+
+    nameInput.addEventListener('input', () => { nameError.hidden = true; });
+
+    // Enter moves on instead of submitting early (still allowed in comment boxes)
+    form.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') return;
+        e.preventDefault();
+        if (current < last) goNext();
+    });
+
+    render(false);
+</script>
+{% endblock %}

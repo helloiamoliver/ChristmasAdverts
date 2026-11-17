@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex justify-center px-4 pt-28 pb-16">
+    <main class="card w-full max-w-xl p-8 sm:p-10 self-start">
+
+        <svg class="mb-6" width="72" height="88" viewBox="0 0 72 88" role="img" aria-label="A decorated Christmas tree">
+            <polygon points="36,4 58,34 14,34" fill="#1d5a43"/>
+            <polygon points="36,20 64,56 8,56" fill="#17503b"/>
+            <polygon points="36,38 70,76 2,76" fill="#123b2d"/>
+            <rect x="31" y="76" width="10" height="10" fill="#6b4a2f"/>
+            <polygon points="36,0 38,6 44,6 39,10 41,16 36,12 31,16 33,10 28,6 34,6" fill="#d9a93a"/>
+            <circle cx="30" cy="30" r="3" fill="#e03a50"/>
+            <circle cx="42" cy="46" r="3" fill="#d9a93a"/>
+            <circle cx="24" cy="58" r="3" fill="#f6f0e0"/>
+            <circle cx="46" cy="66" r="3" fill="#e03a50"/>
+            <circle cx="30" cy="70" r="3" fill="#d9a93a"/>
+        </svg>
+
+        <h1 class="display text-5xl mb-4" style="color: var(--spruce);">Reviews submitted</h1>
+
+        <p class="text-xl leading-relaxed mb-8" style="color: var(--muted);">
+            Thanks for rating the adverts. See how your scores compare with everyone else's.
+        </p>
+
+        <a href="/results" class="btn btn-berry">See results</a>
+    </main>
+</div>
+{% endblock %}

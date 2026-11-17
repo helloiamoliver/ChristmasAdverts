@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center p-8">
+    <div class="max-w-2xl w-full">
+        <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border-4 border-green-600">
+            <div class="text-center mb-8">
+                <h1 class="text-6xl font-bold mb-4 text-green-800 mountains-of-christmas-bold">
+                    UK TTF Christmas Advert Reviews 2026
+                </h1>
+            </div>
+            <div id="introText">
+            <div class="rounded-xl mb-8">
+                <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                    Ho, Ho, Ho!<br><br>
+In the next few minutes, you will watch 6 Christmas Adverts via Microsoft Teams. They will be in the order that you see on screen.
+<br>
+You will then have to rate them out of ten, with 1 being awful and 10 being incredible.
+Also feel free to jot down any comments you have about them in the 'Comments' box.
+Once you have completed this, hit next. You will then be taken to the next advert (via Teams when everyone else is ready).
+At the end, when you have viewed all the videos, press the 'Submit' button. Your response will then be recorded!
+<br><br>
+Let the fun begin!
+                </p>
+            </div>
+            </div>
+            
+            <form action="/submit" method="POST" id="reviewForm">
+            <div id="nameScreen">
+                <div class="mb-8">
+                    <label class="block text-xl font-semibold text-gray-800 mb-3" for="name">
+                        What is your name?
+                    </label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        required
+                        class="w-full px-4 py-3 text-lg border-2 border-green-400 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-500 transition"
+                        placeholder="Enter your name"
+                    >
+                </div>
+                </div>
+                <div id="reviewScreens" style="display: none;">
+                    <!-- Amazon -->
+                    <div class="review-screen" data-brand="johnlewis">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">John Lewis</h2>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3 text-center">
+                                Rate the John Lewis Christmas Advert
+                            </label>
+                            <div class="star-rating" data-brand="johnlewis">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="6">★</span>
+                                <span class="star" data-value="7">★</span>
+                                <span class="star" data-value="8">★</span>
+                                <span class="star" data-value="9">★</span>
+                                <span class="star" data-value="10">★</span>
+                            </div>
+                            <input type="hidden" name="johnlewis_rating" id="johnlewis_rating" required>
+                            <p class="text-center text-sm text-gray-500 mt-2">Click to rate (1-10 stars)</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3">
+                                Any other comments?
+                            </label>
+                            <textarea 
+                                name="johnlewis_comment" 
+                                rows="4" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-500 transition"
+                                placeholder="Share your thoughts..."
+                            ></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Waitrose -->
+                    <div class="review-screen" data-brand="waitrose" style="display: none;">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">Waitrose</h2>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3 text-center">
+                                Rate the Waitrose Christmas Advert
+                            </label>
+                            <div class="star-rating" data-brand="waitrose">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="6">★</span>
+                                <span class="star" data-value="7">★</span>
+                                <span class="star" data-value="8">★</span>
+                                <span class="star" data-value="9">★</span>
+                                <span class="star" data-value="10">★</span>
+                            </div>
+                            <input type="hidden" name="waitrose_rating" id="waitrose_rating" required>
+                            <p class="text-center text-sm text-gray-500 mt-2">Click to rate (1-10 stars)</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3">
+                                Any other comments?
+                            </label>
+                            <textarea 
+                                name="waitrose_comment" 
+                                rows="4" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-500 transition"
+                                placeholder="Share your thoughts..."
+                            ></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Disney -->
+                    <div class="review-screen" data-brand="disney" style="display: none;">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">Disney</h2>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3 text-center">
+                                Rate the Disney Christmas Advert
+                            </label>
+                            <div class="star-rating" data-brand="disney">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="6">★</span>
+                                <span class="star" data-value="7">★</span>
+                                <span class="star" data-value="8">★</span>
+                                <span class="star" data-value="9">★</span>
+                                <span class="star" data-value="10">★</span>
+                            </div>
+                            <input type="hidden" name="disney_rating" id="disney_rating" required>
+                            <p class="text-center text-sm text-gray-500 mt-2">Click to rate (1-10 stars)</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3">
+                                Any other comments?
+                            </label>
+                            <textarea 
+                                name="disney_comment" 
+                                rows="4" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-500 transition"
+                                placeholder="Share your thoughts..."
+                            ></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Barbour -->
+                    <div class="review-screen" data-brand="barbour" style="display: none;">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">Barbour</h2>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3 text-center">
+                                Rate the Barbour Christmas Advert
+                            </label>
+                            <div class="star-rating" data-brand="barbour">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="6">★</span>
+                                <span class="star" data-value="7">★</span>
+                                <span class="star" data-value="8">★</span>
+                                <span class="star" data-value="9">★</span>
+                                <span class="star" data-value="10">★</span>
+                            </div>
+                            <input type="hidden" name="barbour_rating" id="barbour_rating" required>
+                            <p class="text-center text-sm text-gray-500 mt-2">Click to rate (1-10 stars)</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3">
+                                Any other comments?
+                            </label>
+                            <textarea 
+                                name="barbour_comment" 
+                                rows="4" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-500 transition"
+                                placeholder="Share your thoughts..."
+                            ></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Sainsbury's -->
+                    <div class="review-screen" data-brand="mands" style="display: none;">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">M&S Food</h2>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3 text-center">
+                                Rate the M&S Food Christmas Advert
+                            </label>
+                            <div class="star-rating" data-brand="mands">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="6">★</span>
+                                <span class="star" data-value="7">★</span>
+                                <span class="star" data-value="8">★</span>
+                                <span class="star" data-value="9">★</span>
+                                <span class="star" data-value="10">★</span>
+                            </div>
+                            <input type="hidden" name="mands_rating" id="mands_rating" required>
+                            <p class="text-center text-sm text-gray-500 mt-2">Click to rate (1-10 stars)</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3">
+                                Any other comments?
+                            </label>
+                            <textarea 
+                                name="mands_comment" 
+                                rows="4" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-500 transition"
+                                placeholder="Share your thoughts..."
+                            ></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Lidl -->
+                    <div class="review-screen" data-brand="lidl" style="display: none;">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">Lidl</h2>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3 text-center">
+                                Rate the Lidl Christmas Advert
+                            </label>
+                            <div class="star-rating" data-brand="lidl">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="6">★</span>
+                                <span class="star" data-value="7">★</span>
+                                <span class="star" data-value="8">★</span>
+                                <span class="star" data-value="9">★</span>
+                                <span class="star" data-value="10">★</span>
+                            </div>
+                            <input type="hidden" name="lidl_rating" id="lidl_rating" required>
+                            <p class="text-center text-sm text-gray-500 mt-2">Click to rate (1-10 stars)</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3">
+                                Any other comments?
+                            </label>
+                            <textarea 
+                                name="lidl_comment" 
+                                rows="4" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-500 transition"
+                                placeholder="Share your thoughts..."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+                    <div class="review-screen" data-brand="argos" style="display: none;">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">Argos</h2>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3 text-center">
+                                Rate the Argos Christmas Advert
+                            </label>
+                            <div class="star-rating" data-brand="argos">
+                                <span class="star" data-value="1">★</span>
+                                <span class="star" data-value="2">★</span>
+                                <span class="star" data-value="3">★</span>
+                                <span class="star" data-value="4">★</span>
+                                <span class="star" data-value="5">★</span>
+                                <span class="star" data-value="6">★</span>
+                                <span class="star" data-value="7">★</span>
+                                <span class="star" data-value="8">★</span>
+                                <span class="star" data-value="9">★</span>
+                                <span class="star" data-value="10">★</span>
+                            </div>
+                            <input type="hidden" name="argos_rating" id="argos_rating" required>
+                            <p class="text-center text-sm text-gray-500 mt-2">Click to rate (1-10 stars)</p>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-700 mb-3">
+                                Any other comments?
+                            </label>
+                            <textarea 
+                                name="argos_comment" 
+                                rows="4" 
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-200 focus:border-amber-500 transition"
+                                placeholder="Share your thoughts..."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="flex gap-4 mt-8">
+                    <button 
+                        type="button" 
+                        id="backBtn"
+                        style="display: none;"
+                        class="flex-1 bg-gray-500 text-white font-bold py-4 px-8 rounded-xl transition hover:bg-gray-400 text-lg"
+                    >
+                        ← Back
+                    </button>
+                    <button 
+                        type="button" 
+                        id="nextBtn" disabled
+                        class="flex-1 bg-green-800 text-white font-bold py-4 px-8 rounded-xl transition hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-green-800 text-lg"
+                    >
+                        Next →
+                    </button>
+                    <button 
+                        type="submit" 
+                        id="submitBtn"
+                        style="display: none;"
+                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-xl transition transform hover:bg-green-400 text-lg"
+                    >
+                        Submit Reviews
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentScreen = 0;
+    const screens = document.querySelectorAll('.review-screen');
+    const nextBtn = document.getElementById('nextBtn');
+    const backBtn = document.getElementById('backBtn');
+    const introText = document.getElementById('introText');
+    const nameScreen = document.getElementById('nameScreen');
+    const submitBtn = document.getElementById('submitBtn');
+    const reviewScreens = document.getElementById('reviewScreens');
+    const nameInput = document.getElementById('name');
+    nextBtn.disabled = false;
+    
+    // Star rating functionality
+    document.querySelectorAll('.star-rating').forEach(rating => {
+        const brand = rating.dataset.brand;
+        const stars = rating.querySelectorAll('.star');
+        const input = document.getElementById(`${brand}_rating`);
+        
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const value = parseInt(star.dataset.value);
+                input.value = value;
+                
+                stars.forEach((s, idx) => {
+                    if (idx < value) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+                nextBtn.disabled = false;
+            });
+            
+            star.addEventListener('mouseenter', () => {
+                const value = parseInt(star.dataset.value);
+                stars.forEach((s, idx) => {
+                    if (idx < value) {
+                        s.style.color = '#fbbf24';
+                    } else {
+                        s.style.color = '#d1d5db';
+                    }
+                });
+            });
+        });
+        
+        rating.addEventListener('mouseleave', () => {
+            const currentValue = parseInt(input.value) || 0;
+            stars.forEach((s, idx) => {
+                if (idx < currentValue) {
+                    s.style.color = '#fbbf24';
+                } else {
+                    s.style.color = '#d1d5db';
+                }
+            });
+        });
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        if (currentScreen === 0) {
+            if (!nameInput.value.trim()) {
+                alert('Please enter your name!');
+                return;
+            }
+                        // Hide intro + name
+            introText.style.display = 'none';
+            nameScreen.style.display = 'none';
+            reviewScreens.style.display = 'block';
+            backBtn.style.display = 'block';
+        } else {
+            const brand = screens[currentScreen - 1].dataset.brand;
+            const rating = document.getElementById(`${brand}_rating`).value;
+            if (!rating) {
+                alert('Please select a rating!');
+                return;
+            }
+            screens[currentScreen - 1].style.display = 'none';
+        }
+        nextBtn.disabled = true;
+        currentScreen++;
+        
+        if (currentScreen <= screens.length) {
+            screens[currentScreen - 1].style.display = 'block';
+        }
+        
+        if (currentScreen === screens.length) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+        }
+    });
+    
+    backBtn.addEventListener('click', () => {
+        if (currentScreen > 0) {
+            if (currentScreen <= screens.length) {
+                screens[currentScreen - 1].style.display = 'none';
+            }
+            currentScreen--;
+            
+            if (currentScreen === 0) {
+                reviewScreens.style.display = 'none';
+                backBtn.style.display = 'none';
+            } else {
+                screens[currentScreen - 1].style.display = 'block';
+            }
+            
+            nextBtn.style.display = 'block';
+            submitBtn.style.display = 'none';
+            nextBtn.disabled = false;
+        }
+    });
+
+        // Prevent Enter from submitting the form
+document.getElementById('reviewForm').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+
+    // Allow Enter inside textareas
+    if (e.target.tagName === 'TEXTAREA') return;
+
+    e.preventDefault();
+
+    if (currentScreen === 0) {
+        nextBtn.click();
+        return;
+    }
+
+    // Only advance if rating exists
+    const brand = screens[currentScreen - 1]?.dataset.brand;
+    const rating = brand
+        ? document.getElementById(`${brand}_rating`).value
+        : null;
+
+    if (rating && !nextBtn.disabled) {
+        nextBtn.click();
+    }
+});
+
+</script>
+{% endblock %}

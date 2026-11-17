@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen py-12 px-4">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+            <h1 class="text-6xl font-bold mb-4 text-green-300 mountains-of-christmas-bold">
+                Results Dashboard
+            </h1>
+            <p class="text-xl text-white/90">
+                Here's what everyone thought about this year's Christmas adverts!
+            </p>
+        </div>
+        
+        {% if not stats %}
+        <div class="bg-white/95 rounded-3xl p-12 text-center">
+            <p class="text-2xl text-gray-600">No reviews yet! Be the first to share your thoughts.</p>
+            <a href="/" class="inline-block mt-6 gold-shine text-gray-900 font-bold py-3 px-8 rounded-xl">
+                Submit a Review
+            </a>
+        </div>
+        {% else %}
+        
+        <!-- Overall Summary -->
+        <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border-4 border-green-400">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Average Ratings</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {% for brand in brands %}
+                {% if stats[brand] %}
+                <div class="bg-emerald-50 rounded-xl p-6 border-2 border-emerald-400 text-center">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2 capitalize">{{ brand.replace('johnlewis', 'John Lewis').replace('mands', "M&S Food") }}</h3>
+                    <div class="text-5xl font-bold text-green-800 mb-2">
+                        {{ stats[brand].average }}
+                    </div>
+                    <div class="text-3xl gold-shine bg-clip-text text-transparent">★</div>
+                    <p class="text-sm text-gray-600 mt-2">{{ stats[brand].total }} reviews</p>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Detailed Brand Results -->
+        {% for brand in brands %}
+        {% if stats[brand] %}
+        <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border-4 border-green-400">
+            <h2 class="text-4xl font-bold text-gray-800 mb-6 capitalize">
+                {{ brand.replace('johnlewis', 'John Lewis').replace('mands', "M&S Food") }}
+            </h2>
+            
+            <!-- Rating Distribution -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold text-gray-700 mb-4">Rating Distribution</h3>
+                <div class="space-y-2">
+                    {% for rating in range(10, 0, -1) %}
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 text-right font-semibold text-[#f59e0b]">{{ rating }} ★</div>
+                        <div class="flex-1 bg-gray-200 rounded-full h-8 overflow-hidden">
+                            {% set count = stats[brand].distribution.get(rating, 0) %}
+                            {% set percentage = (count / stats[brand].total * 100) if stats[brand].total > 0 else 0 %}
+                            <div 
+                                class="h-full gold-shine flex items-center justify-end pr-3 font-bold text-gray-800 transition-all duration-500"
+                                style="width: {{ percentage }}%"
+                            >
+                                {% if count > 0 %}{{ count }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Comments -->
+            {% if stats[brand].comments %}
+            <div>
+                <h3 class="text-2xl font-semibold text-gray-700 mb-4">What People Said</h3>
+                <div class="grid gap-4">
+                    {% for comment in stats[brand].comments %}
+                    {% if comment.comment %}
+                    <div class="bg-emerald-50 rounded-xl p-4 border-2 border-green-400">
+                        <p class="text-gray-800 italic mb-2">"{{ comment.comment }}"</p>
+                        <p class="text-sm text-gray-600 font-semibold">— {{ comment.name }}</p>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+        
+        <!-- Action Buttons -->
+        <div class="text-center mt-12 space-y-4">
+            <div>
+                <button 
+                    onclick="window.print()" 
+                    class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition transform hover:scale-105 shadow-lg"
+                >
+                    Print Results 🖨️
+                </button>
+            </div>
+        </div>
+        
+        {% endif %}
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    // Animate bars on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const bars = document.querySelectorAll('.gold-shine');
+        bars.forEach((bar, index) => {
+            setTimeout(() => {
+                bar.style.opacity = '1';
+            }, index * 50);
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}
